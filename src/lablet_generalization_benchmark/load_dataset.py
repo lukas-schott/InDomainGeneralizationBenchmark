@@ -56,12 +56,21 @@ class BenchmarkDataset(Dataset):
         labels_filename = "{}_{}_{}_labels.npz".format(dataset_name, variant, mode)
 
         self._factor_sizes = None
+        self._factor_names = None
         if dataset_name == 'dsprites':
             self._factor_sizes = [3, 6, 40, 32, 32]
+            self._factor_names = ['shape', 'scale', 'orientation', 'x-position',
+                            'y-position']
         elif dataset_name == 'shapes3d':
             self._factor_sizes = [10, 10, 10, 8, 4, 15]
+            self._factor_names = [
+            'floor color', 'wall color', 'object color', 'object size',
+            'object type', 'azimuth']
         elif dataset_name == 'mpi3d':
             self._factor_sizes = [6, 6, 2, 3, 3, 40, 40]
+            self._factor_names = ['color', 'shape', 'size', 'height', 'bg color',
+                        'x-axis', 'y-axis']
+
         self._index_manager = IndexManger(self._factor_sizes)
 
         images_path = os.path.join(DATASET_PATH, images_filename)
@@ -81,6 +90,13 @@ class BenchmarkDataset(Dataset):
 
     def __len__(self):
         return len(self._dataset_labels)
+
+    def get_normalized_labels(self):
+        return self._labels / (np.array(self._factor_sizes) - 1)
+
+    @property
+    def _labels(self):
+        return self._index_manager.index_to_feat
 
     def __getitem__(self, idx: int):
         image = self._dataset_images[idx]
