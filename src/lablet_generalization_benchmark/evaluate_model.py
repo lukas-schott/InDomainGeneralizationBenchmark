@@ -15,43 +15,6 @@ class RSquared:
         mse_loss_per_factor = np.mean(np.power(predictions - targets, 2), axis=0)
         return 1 - mse_loss_per_factor / self.variance_per_factor
 
-#
-# def collect_per_factor(per_factors, name,
-#                        factor_names,
-#                        aggregate_fct=np.mean):
-#     per_factor = torch.stack(per_factors, dim=0).mean(dim=0)
-#     for factor_i, factor_name in zip(per_factor, factor_names):
-#         writer.add_scalar(f'{mode}_{name}/{factor_name}', factor_i, epoch)
-#     writer.add_scalar(f'{mode}/{name}', aggregate_fct(per_factor), epoch)
-
-
-def test_epoch(epoch, model, data_loader, writer, device, rsquared=None,
-               mode='test'):
-    model.eval()
-    log = {'rsquared': [], 'mse': []}
-    with torch.no_grad():
-        for iteration, (batch, targets) in enumerate(data_loader):
-            batch = batch.to(device)
-            targets = targets.to(device)
-            predictions = model(batch)
-            squared_diff = (targets - predictions).pow(2)
-            r_squared_per_factor = rsquared(predictions, targets)
-
-            # bookkeeping
-            log['rsquared'].append(r_squared_per_factor.detach())
-            log['mse'].append(squared_diff.mean(dim=0).detach())
-
-            if iteration == 0:
-                grid = make_grid(batch[:64], pad_value=1)
-                writer.add_image('test/batch', grid, epoch)
-    #
-    # collect_per_factor(log['rsquared'], 'rsquared',
-    #                    data_loader.dataset.factor_names, writer)
-    # collect_per_factor(log['mse'], 'mse',
-    #                    data_loader.dataset.factor_names, writer,
-    #                    aggregate_fct=torch.sum)
-    return
-
 
 def r2(ground_truths, predictions):
     """Returns the r2 score"""
