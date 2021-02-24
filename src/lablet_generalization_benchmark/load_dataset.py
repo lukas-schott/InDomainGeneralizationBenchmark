@@ -5,6 +5,7 @@ import numpy as np
 import os
 import logging
 from sklearn.utils.extmath import cartesian
+from torchvision.transforms import ToTensor
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
@@ -54,7 +55,7 @@ class BenchmarkDataset(Dataset):
         super().__init__()
         images_filename = "{}_{}_{}_images.npz".format(dataset_name, variant, mode)
         labels_filename = "{}_{}_{}_labels.npz".format(dataset_name, variant, mode)
-
+        self.transform = ToTensor()
         self._factor_sizes = None
         self._factor_names = None
         if dataset_name == 'dsprites':
@@ -98,9 +99,14 @@ class BenchmarkDataset(Dataset):
     def _labels(self):
         return self._index_manager.index_to_feat
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, idx: int, normalize: bool = True):
         image = self._dataset_images[idx]
         labels = self._dataset_labels[idx]
+        if normalize:
+            labels = labels / (np.array(self._factor_sizes) - 1)
+        if self.transform is not None:
+            image = np.transpose(image, (1, 2, 0))
+            image = self.transform(image)
 
         sample = {'image': image, 'labels': labels}
         return sample
@@ -118,7 +124,6 @@ def load_dataset(dataset_name='shapes3d', variant='random', mode='train', dir=No
     Returns:
         dataset
     """
-
     dataset = BenchmarkDataset(dataset_name, variant, mode, dir)
 
     data_loader = torch.utils.data.DataLoader(dataset,

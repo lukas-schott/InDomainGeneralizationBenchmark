@@ -1,7 +1,5 @@
 from sklearn.metrics import r2_score
 import numpy as np
-import math
-
 
 class RSquared:
     def __init__(self, normalized_labels: np.ndarray):
@@ -41,7 +39,6 @@ def evaluate_model(model_fn, dataset_loader, metrics=None):
     score_dict = dict()
     targets = None
     predictions = None
-    batch_index = 1
     for batch in dataset_loader:
         images, labels = batch['image'], batch['labels'].numpy()
         batch_prediction = model_fn(images)
@@ -52,8 +49,6 @@ def evaluate_model(model_fn, dataset_loader, metrics=None):
         else:
             targets = np.append(targets, labels, axis=0)
             predictions = np.append(predictions, batch_prediction, axis=0)
-        # if batch_index == 1:
-        #     break
 
     labels_01 = dataset_loader.dataset.get_normalized_labels()
     r_squared = RSquared(labels_01)
@@ -61,14 +56,10 @@ def evaluate_model(model_fn, dataset_loader, metrics=None):
     squared_diff = np.power(targets - predictions, 2)
     r_squared_per_factor = r_squared(predictions, targets)
 
-    # bookkeeping
-    log = {'rsquared': [], 'mse': []}
-    log['rsquared'].append(r_squared_per_factor)
-    log['mse'].append(np.mean(squared_diff, axis=0))
+    # book keeping
+    log = {'rsquared': r_squared_per_factor, 'mse': np.mean(squared_diff, axis=0)}
     factor_names = dataset_loader.dataset._factor_names
     for factor_index in range(r_squared_per_factor.shape[0]):
-        score_dict['rsquared_{}'.format(factor_names[factor_index])] = log['rsquared'][0][factor_index]
-        score_dict['mse_{}'.format(factor_names[factor_index])] = log['mse'][0][factor_index]
-    # for metric_key in metrics.keys():
-    #     score_dict[metric_key] = metrics[metric_key](ground_truths, predictions)
+        score_dict['rsquared_{}'.format(factor_names[factor_index])] = log['rsquared'][factor_index]
+        score_dict['mse_{}'.format(factor_names[factor_index])] = log['mse'][factor_index]
     return score_dict
