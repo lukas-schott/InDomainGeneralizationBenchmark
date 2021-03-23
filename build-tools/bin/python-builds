@@ -35,7 +35,8 @@ version=${1##$type}
 #   hint: numeric tests: -lt (<), -le (<=), -eq (==), -ge (>=), -gt (>)
 # It's time; by default, this package only builds for 3.6 and higher. It's
 # enabled in `live` so... let's do this!
-[[ $version -gt 35 ]] || exit 1  # > 35
+# [[ $version -gt 35 ]] || exit 1  # > 35
+[[ $version -eq 36 ]] || exit 1  # =3.6 because of PyTorch
 # [[ $version -eq 27 || $version -ge 35 ]] || exit 1  # 27 or >=35
 # [[ $version -gt 32 && $version -le 36 ]] || exit 1  # >32 and <=36
 
