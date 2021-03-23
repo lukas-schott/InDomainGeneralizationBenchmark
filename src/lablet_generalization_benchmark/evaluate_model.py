@@ -1,16 +1,18 @@
-from sklearn.metrics import r2_score
 import numpy as np
+import sklearn.metrics
+
 
 class RSquared:
     def __init__(self, normalized_labels: np.ndarray):
-        variance_per_factor = ((normalized_labels - normalized_labels.mean(
-            axis=0, keepdims=True)) ** 2).mean(axis=0)
+        variance_per_factor = (
+            (normalized_labels -
+             normalized_labels.mean(axis=0, keepdims=True))**2).mean(axis=0)
         self.variance_per_factor = variance_per_factor
 
-    def __call__(self, predictions,
-                 targets):
+    def __call__(self, predictions, targets):
         assert predictions.shape == targets.shape
-        mse_loss_per_factor = np.mean(np.power(predictions - targets, 2), axis=0)
+        mse_loss_per_factor = np.mean(np.power(predictions - targets, 2),
+                                      axis=0)
         return 1 - mse_loss_per_factor / self.variance_per_factor
 
 
@@ -19,12 +21,13 @@ def r2(ground_truths, predictions):
     assert ground_truths.shape == predictions.shape
     r2_per_factor = np.zeros((ground_truths.shape[1]))
     for i in range(ground_truths.shape[1]):
-        r2_per_factor[i] = r2_score(ground_truths[:, i], predictions[:, i])
+        r2_per_factor[i] = sklearn.metrics.r2_score(ground_truths[:, i], predictions[:, i])
     return r2_per_factor
 
 
 def evaluate_model(model_fn, dataset_loader, metrics=None):
     """ Returns the benchmark scores of a given model under a particular dataset
+
     Args:
         model_fn: a function of the model that has an array of images as input and returns the predicted labels
         dataset_loader: a dataset on which the model shall be evaluated
@@ -57,9 +60,14 @@ def evaluate_model(model_fn, dataset_loader, metrics=None):
     r_squared_per_factor = r_squared(predictions, targets)
 
     # book keeping
-    log = {'rsquared': r_squared_per_factor, 'mse': np.mean(squared_diff, axis=0)}
+    log = {
+        'rsquared': r_squared_per_factor,
+        'mse': np.mean(squared_diff, axis=0)
+    }
     factor_names = dataset_loader.dataset._factor_names
     for factor_index in range(r_squared_per_factor.shape[0]):
-        score_dict['rsquared_{}'.format(factor_names[factor_index])] = log['rsquared'][factor_index]
-        score_dict['mse_{}'.format(factor_names[factor_index])] = log['mse'][factor_index]
+        score_dict['rsquared_{}'.format(
+            factor_names[factor_index])] = log['rsquared'][factor_index]
+        score_dict['mse_{}'.format(
+            factor_names[factor_index])] = log['mse'][factor_index]
     return score_dict

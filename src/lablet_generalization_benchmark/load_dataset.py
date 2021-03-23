@@ -1,11 +1,11 @@
-import torch
-from torch.utils.data import Dataset
 from typing import List
-import numpy as np
-import os
 import logging
-from sklearn.utils.extmath import cartesian
-from torchvision.transforms import ToTensor
+import os
+
+import numpy as np
+import sklearn.utils.extmath
+import torch.utils.data
+import torchvision.transforms
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
@@ -13,7 +13,6 @@ LOGGER = logging.getLogger(__name__)
 
 class IndexManger(object):
     """Index mapping from features to positions of state space atoms."""
-
     def __init__(self, factor_sizes: List[int]):
         """Index to latent (= features) space and vice versa.
         Args:
@@ -24,7 +23,7 @@ class IndexManger(object):
         self.num_total = np.prod(self.factor_sizes)
         self.factor_bases = self.num_total / np.cumprod(self.factor_sizes)
 
-        self.index_to_feat = cartesian(
+        self.index_to_feat = sklearn.utils.extmath.cartesian(
             [np.array(list(range(i))) for i in self.factor_sizes])
 
     def features_to_index(self, features):
@@ -46,31 +45,36 @@ class IndexManger(object):
         return features
 
 
-class BenchmarkDataset(Dataset):
-
+class BenchmarkDataset(torch.utils.data.Dataset):
     def __init__(self, dataset_name, variant, mode, dir=None):
         DATASET_PATH = "dataset_splits"
         if dir is not None:
             DATASET_PATH = os.path.join(dir, DATASET_PATH)
         super().__init__()
-        images_filename = "{}_{}_{}_images.npz".format(dataset_name, variant, mode)
-        labels_filename = "{}_{}_{}_labels.npz".format(dataset_name, variant, mode)
-        self.transform = ToTensor()
+        images_filename = "{}_{}_{}_images.npz".format(dataset_name, variant,
+                                                       mode)
+        labels_filename = "{}_{}_{}_labels.npz".format(dataset_name, variant,
+                                                       mode)
+        self.transform = torchvision.transforms.ToTensor()
         self._factor_sizes = None
         self._factor_names = None
         if dataset_name == 'dsprites':
             self._factor_sizes = [3, 6, 40, 32, 32]
-            self._factor_names = ['shape', 'scale', 'orientation', 'x-position',
-                            'y-position']
+            self._factor_names = [
+                'shape', 'scale', 'orientation', 'x-position', 'y-position'
+            ]
         elif dataset_name == 'shapes3d':
             self._factor_sizes = [10, 10, 10, 8, 4, 15]
             self._factor_names = [
-            'floor color', 'wall color', 'object color', 'object size',
-            'object type', 'azimuth']
+                'floor color', 'wall color', 'object color', 'object size',
+                'object type', 'azimuth'
+            ]
         elif dataset_name == 'mpi3d':
             self._factor_sizes = [6, 6, 2, 3, 3, 40, 40]
-            self._factor_names = ['color', 'shape', 'size', 'height', 'bg color',
-                        'x-axis', 'y-axis']
+            self._factor_names = [
+                'color', 'shape', 'size', 'height', 'bg color', 'x-axis',
+                'y-axis'
+            ]
 
         self._index_manager = IndexManger(self._factor_sizes)
 
@@ -112,7 +116,12 @@ class BenchmarkDataset(Dataset):
         return sample
 
 
-def load_dataset(dataset_name='shapes3d', variant='random', mode='train', dir=None, batch_size=4, num_workers=0):
+def load_dataset(dataset_name='shapes3d',
+                 variant='random',
+                 mode='train',
+                 dir=None,
+                 batch_size=4,
+                 num_workers=0):
     """ Returns a torch dataset loader for the requested split
     Args:
         dataset_name (str): the dataset name, can be either 'shapes3d, 'dsprites' or 'mpi3d'
