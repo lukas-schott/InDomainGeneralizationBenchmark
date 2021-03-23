@@ -33,6 +33,9 @@ package.LabletGeneralizationBenchmark = {
             # See setup.py
             #
             # Python-setuptools = default;
+
+            PyTorch = 1.4.x;
+            Python-numpy = 1.x;
         };
     };
 
