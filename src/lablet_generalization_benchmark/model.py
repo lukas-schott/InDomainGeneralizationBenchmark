@@ -3,17 +3,17 @@ from torch import nn
 
 
 class VanillaCNN(nn.Module):
-    def __init__(self, number_classes: int, number_channels: int):
+    def __init__(self, number_of_classes: int, number_of_channels: int):
         """
         Standard ConvNet Architecture similar to the Locatello Disentanglement
         Library models.
         Args:
-            number_classes: number of classes in the dataset
-            number_channels: number channels of the input image
+            number_of_classes: number of classes in the dataset
+            number_of_channels: number channels of the input image
         """
         super().__init__()
         self.net = nn.Sequential(
-            nn.Conv2d(number_channels, 32, 4, 2, 1),  # B,  32, 32, 32
+            nn.Conv2d(number_of_channels, 32, 4, 2, 1),  # B,  32, 32, 32
             nn.ReLU(True),
             nn.Conv2d(32, 32, 4, 2, 1),  # B,  32, 16, 16
             nn.ReLU(True),
@@ -24,7 +24,7 @@ class VanillaCNN(nn.Module):
             nn.Conv2d(64, 256, 4, 1),  # B, 256,  1,  1
             nn.ReLU(True),
             View((-1, 256 * 1 * 1)),  # B, 256
-            nn.Linear(256, number_classes),  # B, number_classes
+            nn.Linear(256, number_of_classes),  # B, number_of_classes
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
