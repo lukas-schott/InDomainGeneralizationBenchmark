@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Runs tests in a non-Brazil setup.
+# Runs tests in on standard setup.
 # Make sure to install pytest and pytest-cov via:
 # pip install pytest pytest-cov
 
