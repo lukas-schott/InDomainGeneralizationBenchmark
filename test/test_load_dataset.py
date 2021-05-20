@@ -1,3 +1,5 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
 import numpy as np
 
 import lablet_generalization_benchmark.load_dataset as load_dataset
