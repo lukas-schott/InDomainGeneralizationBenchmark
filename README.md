@@ -8,19 +8,19 @@ This procedure is visualized in the figure below.
 ![Dataset Splits](./assets/dataset_splits.png)
 Fig. 1: In the four scatter plots, we see various splits along the generative
  factors of variations for the dSprites dataset. The axes correspond to
-   factors of variation in the data i.e. *scale* as visualized for
+   factors of variation in the data, i.e., *scale* as visualized for
    extrapolation on the right. 
 
 ### Datasets
 We consider the dSprites, Shapes3D and MPI3D-Real dataset. The splits
- corresponding to random, compostion, interpolation and extrapolation can be
+ corresponding to random, composition, interpolation and extrapolation can be
   found at _placeholder_. 
 
 ### Training
 In this benchmark, we allow for a wide variety of modelling approaches and also
  leveraging external data. 
-For instance various types of supervision are allowed from unsupervised, 
-weakly-supervsied, supervised to transfer-learning. 
+For instance, various types of supervision are allowed from unsupervised,
+weakly-supervised, supervised to transfer-learning.
 However, the test set should remain untouched and can **only** be used for
  evaluation. 
  
