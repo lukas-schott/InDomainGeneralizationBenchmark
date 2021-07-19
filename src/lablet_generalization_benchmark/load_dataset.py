@@ -58,6 +58,8 @@ class BenchmarkDataset(torch.utils.data.Dataset):
         self._index_manager = IndexManger(self._factor_sizes)
 
         def load_data(filename):
+            if not os.path.exists(filename):
+                self.download_dataset(filename)
             return np.load(filename,
                            encoding='latin1',
                            allow_pickle=True)['arr_0']
@@ -88,6 +90,24 @@ class BenchmarkDataset(torch.utils.data.Dataset):
             image = self.transform(image)
 
         return image, targets
+
+    @staticmethod
+    def download_dataset(self, file_path):
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        from urllib import request
+        if 'dsprites' in file_path.lower():
+            zenodo_code = '4835774'
+        elif 'shapes3d' in file_path.lower():
+            zenodo_code = '4898937'
+        elif 'mpi3d' in file_path.lower():
+            zenodo_code = '4899346'
+        else:
+            raise Exception('datsaet needs to be ')
+        url = 'https://zenodo.org/record/{}/files/{}?download=1'.\
+            format(zenodo_code, os.path.split(file_path)[-1])
+
+        print(f'file not found locally, downloading from {url} ...')
+        request.urlretrieve(url, file_path, )
 
 
 def load_dataset(dataset_name: str,
