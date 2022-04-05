@@ -54,6 +54,9 @@ class BenchmarkDataset(torch.utils.data.Dataset):
                 'color', 'shape', 'size', 'height', 'bg color', 'x-axis',
                 'y-axis'
             ]
+        elif dataset_name == 'celeb_glow':
+            self._factor_sizes = [1000, 6, 6, 6]
+            self._factor_names = ['person', 'smile', 'blond', 'age']
 
         self._index_manager = IndexManger(self._factor_sizes)
 
@@ -92,7 +95,7 @@ class BenchmarkDataset(torch.utils.data.Dataset):
         return image, targets
 
     @staticmethod
-    def download_dataset(self, file_path):
+    def download_dataset(file_path):
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         from urllib import request
         if 'dsprites' in file_path.lower():
@@ -101,6 +104,8 @@ class BenchmarkDataset(torch.utils.data.Dataset):
             zenodo_code = '4898937'
         elif 'mpi3d' in file_path.lower():
             zenodo_code = '4899346'
+        elif 'celeb_glow' in file_path.lower():
+            zenodo_code = '5512188'
         else:
             raise Exception('datsaet needs to be ')
         url = 'https://zenodo.org/record/{}/files/{}?download=1'.\
